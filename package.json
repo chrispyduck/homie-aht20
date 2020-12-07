@@ -1,6 +1,6 @@
 {
   "name": "@chrispyduck/homie-aht20",
-  "description": "Homie + AHT20 temperature and humidity sensor",
+  "description": "AHT20 temperature and humidity sensor with Homie support",
   "version": "0.1.0",
   "author": {
     "name": "Chris Carlson",
@@ -32,6 +32,8 @@
     "@types/faker": "^4.1.12",
     "@types/mocha": "^7.0.2",
     "@types/sinon": "^9.0.4",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@typescript-eslint/parser": "^4.9.0",
     "chai": "^4.2.0",
     "chai-events": "0.0.3",
     "coveralls": "^3.1.0",
@@ -54,15 +56,16 @@
     "mqtt": "^2.18.8",
     "winston": "^3.3.3"
   },
+  "peerDependencies": {
+    "@chrispyduck/homie-device": "0.1.0-unstable"
+  },
   "scripts": {
     "watch": "watch 'npm run test' .",
     "clean": "shx rm -rf node_modules/ dist/ docs/ tsconfig.tsbuildinfo",
     "build": "tsc --build src",
     "rebuild": "npm run clean && npm install && npm run build",
     "test": "nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts test/**/*.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "optionalDependencies": {
-    "@chrispyduck/homie-device": "0.1.0-unstable"
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "lint": "npx eslint 'src/**/*.ts' 'test/**/*.ts'"
   }
 }

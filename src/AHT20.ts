@@ -1,7 +1,8 @@
-import { II2CCommand } from "./II2CCommand";
-import { I2CDevice } from "./I2CDevice";
-import { II2CConfiguration } from "./II2CConfiguration";
+import { HomieDevice, PropertyDataType } from "@chrispyduck/homie-device";
 import { merge } from "lodash";
+import { I2CDevice } from "./I2CDevice";
+import { II2CCommand } from "./II2CCommand";
+import { II2CConfiguration } from "./II2CConfiguration";
 
 export const I2C_ADDRESS = 0x38;
 
@@ -9,7 +10,7 @@ interface ICommands {
   status: II2CCommand,
   init: II2CCommand,
   measure: II2CCommand,
-};
+}
 const commands: ICommands = {
   status: {
     delay: 200,
@@ -37,7 +38,7 @@ enum State {
   ReceiveMeasurement = 11,
 }
 
-export default class AHT20 extends I2CDevice {
+export default class AHT20 extends I2CDevice implements ISensor {
 
   public static readonly DefaultConfiguration: II2CConfiguration = {
     busNumber: 1,
@@ -45,13 +46,13 @@ export default class AHT20 extends I2CDevice {
   };
 
   constructor(config?: II2CConfiguration) {
-    super('AHT20', merge({}, AHT20.DefaultConfiguration, config));
+    super("AHT20", merge({}, AHT20.DefaultConfiguration, config));
   }
 
-  private humidity$: number = 0;
+  private humidity$ = 0;
   public get humidity(): number { return this.humidity$; }
 
-  private temperature$: number = 0;
+  private temperature$ = 0;
   public get temperature(): number { return this.temperature$; }
 
   private readonly buffer = Buffer.alloc(8);
@@ -60,7 +61,7 @@ export default class AHT20 extends I2CDevice {
     if (value === this.state$)
       return;
     this.state$ = value;
-    this.emit('state', value);
+    this.emit("state", value);
   }
   public get state(): State {
     return this.state$;
@@ -73,11 +74,44 @@ export default class AHT20 extends I2CDevice {
     await this.measure();
   }
 
+  public register = (device: HomieDevice): void => {
+    const node = device.node({
+      name: "aht20",
+      friendlyName: "AHT20", 
+      type: "sensor",
+      isRange: false,
+    });
+    const temperatureProperty = node.addProperty({
+      dataType: PropertyDataType.float,
+      name: "temperature",
+      friendlyName: "Temperature",
+      settable: false,
+      format: "-20:120",
+      unit: "°F",
+      retained: true,
+    });
+    this.on("temperature", (t: number) => {
+      temperatureProperty.publishValue(t);
+    });
+    const humidityProperty = node.addProperty({
+      dataType: PropertyDataType.float,
+      name: "humidity",
+      friendlyName: "Humidity",
+      settable: false,
+      format: "0:100",
+      unit: "%",
+      retained: true,
+    });
+    this.on("humidity", (h: number) => {
+      humidityProperty.publishValue(h);
+    });
+  }
+
   /**
    * Sends the status query command
    */
   private queryStatus = async (): Promise<IStatusResult> => {
-    this.logger.verbose(`Requesting device status`);
+    this.logger.verbose("Requesting device status");
     this.setState(State.ReceiveStatus);
     await this.sendCommand(commands.status);
     return await this.readStatus(State.Idle);
@@ -93,7 +127,7 @@ export default class AHT20 extends I2CDevice {
       calibrationEnabled: (byte & (1 << COMMAND_STATUS_BIT_CALIBRATION_ENABLE)) > 0,
     };
     if (!result.busy)
-    this.setState(stateIfIdle);
+      this.setState(stateIfIdle);
     this.logger.debug(`Received status response ${byte} (busy=${result.busy}, calibrationEnabled=${result.calibrationEnabled})`);
     return result;
   }
@@ -101,15 +135,15 @@ export default class AHT20 extends I2CDevice {
   private initializeDevice = async (): Promise<void> => {
     if (!this.bus)
       throw new Error("Bus has not been opened. Did you forget to call init()?");
-    this.logger.verbose('Sending initialization command to AHT20');
+    this.logger.verbose("Sending initialization command to AHT20");
     await this.sendCommand(commands.init);
   }
 
   private measure = async (): Promise<void> => {
-    this.logger.debug('Requesting measurement');
+    this.logger.debug("Requesting measurement");
     this.setState(State.ReceiveStatus);
     await this.sendCommand(commands.measure);
-    var status = await this.readStatus(State.ReceiveMeasurement);
+    let status = await this.readStatus(State.ReceiveMeasurement);
     while (status.busy) {
       await this.delay(10);
       status = await this.readStatus(State.ReceiveMeasurement);
@@ -151,10 +185,10 @@ export default class AHT20 extends I2CDevice {
     const crc_received = readResult.buffer[6];
     const crc_computed = this.crc8x_simple(readResult.buffer, 6);
     if (crc_received != crc_computed) {
-      this.logger.warn(`Received invalid data from sensor (crc received=${crc_received}, computed=${crc_computed}): ${readResult.buffer.toString('hex')}`);
+      this.logger.warn(`Received invalid data from sensor (crc received=${crc_received}, computed=${crc_computed}): ${readResult.buffer.toString("hex")}`);
     } else {
-      this.emit('humidity', this.humidity$);
-      this.emit('temperature', this.temperature$);
+      this.emit("humidity", this.humidity$);
+      this.emit("temperature", this.temperature$);
     }
     this.setState(State.Idle);
   }
@@ -162,10 +196,10 @@ export default class AHT20 extends I2CDevice {
   // adapted from https://stackoverflow.com/questions/51752284/how-to-calculate-crc8-in-c
   private crc8x_simple = (input: Buffer, length: number) => {
     let crc = 0xFF;
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       crc ^= input[i];
-      for (var k = 0; k < 8; k++)
-          crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
+      for (let k = 0; k < 8; k++)
+        crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
     }
     crc &= 0xff;
     return crc;

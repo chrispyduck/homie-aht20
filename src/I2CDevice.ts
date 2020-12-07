@@ -12,7 +12,7 @@ export abstract class I2CDevice extends EventEmitter {
     this.configuration = merge({}, AHT20.DefaultConfiguration, configuration);
     this.logger = winston.child({
       type: deviceType,
-      name: 'default',
+      name: "default",
     });
   }
 
