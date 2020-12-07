@@ -1,0 +1,12 @@
+coverage
+node_modules
+.piper
+.nyc_output
+.nycrc
+.travis.yml
+*.md
+.git*
+tsconfig.*
+src
+bin
+test

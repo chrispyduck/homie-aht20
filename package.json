@@ -1,0 +1,68 @@
+{
+  "name": "@chrispyduck/homie-aht20",
+  "description": "Homie + AHT20 temperature and humidity sensor",
+  "version": "0.1.0",
+  "author": {
+    "name": "Chris Carlson",
+    "url": "https://github.com/chrispyduck"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/chrispyduck/homie-aht20.git"
+  },
+  "keywords": [
+    "AHT20",
+    "Homie",
+    "MQTT",
+    "IoT",
+    "RaspberryPi",
+    "Mosquitto",
+    "HiveMQ",
+    "WebSphereMQ",
+    "ActiveMQ",
+    "RabbitMQ"
+  ],
+  "devDependencies": {
+    "@bazel/typescript": "^1.7.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/chai": "^4.2.11",
+    "@types/faker": "^4.1.12",
+    "@types/mocha": "^7.0.2",
+    "@types/sinon": "^9.0.4",
+    "chai": "^4.2.0",
+    "chai-events": "0.0.3",
+    "coveralls": "^3.1.0",
+    "eslint": "^7.15.0",
+    "faker": "^4.1.0",
+    "mocha": "^7.2.0",
+    "nyc": "^14.1.1",
+    "shx": "^0.3.2",
+    "sinon": "^9.0.2",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7",
+    "watch": "^1.0.2"
+  },
+  "dependencies": {
+    "@types/i2c-bus": "^5.1.0",
+    "@types/lodash": "^4.14.165",
+    "@types/node": "^13.13.9",
+    "i2c-bus": "^5.2.1",
+    "lodash": "^4.17.20",
+    "mqtt": "^2.18.8",
+    "winston": "^3.3.3"
+  },
+  "scripts": {
+    "watch": "watch 'npm run test' .",
+    "clean": "shx rm -rf node_modules/ dist/ docs/ tsconfig.tsbuildinfo",
+    "build": "tsc --build src",
+    "rebuild": "npm run clean && npm install && npm run build",
+    "test": "nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts test/**/*.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "optionalDependencies": {
+    "@chrispyduck/homie-device": "0.1.0-unstable"
+  }
+}
