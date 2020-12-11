@@ -3,6 +3,7 @@ import { merge } from "lodash";
 import { I2CDevice } from "./I2CDevice";
 import { II2CCommand } from "./II2CCommand";
 import { II2CConfiguration } from "./II2CConfiguration";
+import ISensor from "./ISensor";
 
 export const I2C_ADDRESS = 0x38;
 

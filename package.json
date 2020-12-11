@@ -27,6 +27,7 @@
   ],
   "devDependencies": {
     "@bazel/typescript": "^1.7.0",
+    "@chrispyduck/homie-device": "0.1.0-unstable",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/faker": "^4.1.12",
@@ -65,6 +66,7 @@
     "build": "tsc --build src",
     "rebuild": "npm run clean && npm install && npm run build",
     "test": "nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts test/**/*.js",
+    "test.all": "nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register test/**/*.ts test/**/*.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "npx eslint 'src/**/*.ts' 'test/**/*.ts'"
   }
