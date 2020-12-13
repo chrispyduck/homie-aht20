@@ -23,7 +23,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: https://registry.npmjs.org/
         token: ${{ secrets.NPM_TOKEN }}
-        scope: chrispyduck 
+
+    - name: Add GPR to .npmrc
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${GH_READ_TOKEN}" > .npmrc
+        echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
+      env:
+        GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
 
     - run: npm install
 
