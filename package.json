@@ -21,7 +21,7 @@
   ],
   "devDependencies": {
     "@bazel/typescript": "^1.7.0",
-    "@chrispyduck/homie-device": "^0.1.1-unstable",
+    "@chrispyduck/homie-device": "^0.1.1-main.4d479b6",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
