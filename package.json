@@ -67,11 +67,11 @@
   "scripts": {
     "watch": "watch 'npm run test' .",
     "clean": "shx rm -rf node_modules/ dist/ docs/ tsconfig.tsbuildinfo",
-    "build": "tsc --build src",
+    "build": "npx tsc --build src",
     "rebuild": "npm run clean && npm install && npm run build",
-    "test": "nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts test/**/*.js",
-    "test.all": "nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register test/**/*.ts test/**/*.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test": "npx nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts test/**/*.js",
+    "test.all": "npx nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register test/**/*.ts test/**/*.js",
+    "coverage": "npx nyc report --reporter=text-lcov | coveralls",
     "lint": "npx eslint 'src/**/*.ts' 'test/**/*.ts'"
   }
 }
