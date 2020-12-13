@@ -15,7 +15,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://npm.pkg.github.com/chrispyduck"
+    "registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "AHT20",
