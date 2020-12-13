@@ -1,7 +1,7 @@
 {
   "name": "@chrispyduck/homie-sensors",
   "description": "Sensor library intended for ues with homie-device",
-  "version": "0.1.0-unstabe",
+  "version": "0.1.0-unstable",
   "author": {
     "name": "Chris Carlson",
     "url": "https://github.com/chrispyduck"
@@ -12,10 +12,6 @@
   "repository": {
     "type": "git",
     "url": "http://github.com/chrispyduck/homie-aht20.git"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.pkg.github.com"
   },
   "keywords": [
     "AHT20",

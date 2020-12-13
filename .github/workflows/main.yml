@@ -17,20 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Configure Node.js ${{ matrix.node-version }}
+    - name: Configure Node.js ${{ matrix.node-version }} for npmjs
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-        registry-url: https://npm.pkg.github.com/
+        registry-url: https://registry.npmjs.org/
+        token: ${{ secrets.NPM_TOKEN }}
         scope: chrispyduck 
-        always-auth: true
-
-    - name: npmrcgen
-      run: |
-        echo "//npm.pkg.github.com/:_authToken=${GH_READ_TOKEN}" > .npmrc
-        echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
-      env:
-        GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
 
     - run: npm install
 
@@ -41,16 +34,33 @@ jobs:
     - run: npm run test
       env:
         CI: true
+    
+    - name: Update Package Version
+      run: npx version-from-git --no-git-tag-version
 
-    - name: Configure Node.js ${{ matrix.node-version }} (again)
+    - name: Publish (npmjs)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+        echo "@chrispyduck=https://registry.npmjs.org/" >> .npmrc
+        npm publish --access public 
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
+    - name: Configure Node.js ${{ matrix.node-version }} for GPR
+      if: github.ref == 'refs/heads/main'
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-        registry-url: https://npm.pkg.github.com/
+        registry-url: https://npm.pkg.github.com  
         scope: chrispyduck 
         always-auth: true
-    
-    - run: npm publish
+
+    - name: Publish (GitHub Package Registry)
       if: github.ref == 'refs/heads/main'
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
+        echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
+        npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
