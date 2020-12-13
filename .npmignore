@@ -4,6 +4,7 @@ node_modules
 .nyc_output
 .nycrc
 .travis.yml
+.eslintrc.json
 *.md
 .git*
 tsconfig.*
