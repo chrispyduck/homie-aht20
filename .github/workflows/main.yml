@@ -17,17 +17,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Configure Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-        registry-url: https://npm.pkg.github.com/  
+        registry-url: https://npm.pkg.github.com/
         scope: chrispyduck 
         always-auth: true
 
     - name: npmrcgen
       run: |
-        cp .npmrc .npmrc.github
         echo "//npm.pkg.github.com/:_authToken=${GH_READ_TOKEN}" > .npmrc
         echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
       env:
@@ -43,10 +42,13 @@ jobs:
       env:
         CI: true
 
-    - name: pre-publish
-      run: |
-        rm .npmrc
-        mv .npmrc.github .npmrc
+    - name: Configure Node.js ${{ matrix.node-version }} (again)
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: https://npm.pkg.github.com/
+        scope: chrispyduck 
+        always-auth: true
     
     - run: npm publish
       if: github.ref == 'refs/heads/main'
