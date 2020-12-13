@@ -25,6 +25,13 @@ jobs:
         scope: chrispyduck 
         always-auth: true
 
+    - name: npmrcgen
+      run: |
+        echo "//npm.pkg.github.com/:_authToken=${GH_READ_TOKEN}" > .npmrc
+        echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
+      env:
+        GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+
     - run: npm install
 
     - run: npm run build
