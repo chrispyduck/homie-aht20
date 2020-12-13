@@ -23,6 +23,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: https://npm.pkg.github.com  
         scope: chrispyduck 
+        always-auth: true
 
     - run: npm install
 
