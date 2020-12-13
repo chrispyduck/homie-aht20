@@ -27,6 +27,7 @@ jobs:
 
     - name: npmrcgen
       run: |
+        cp .npmrc .npmrc.github
         echo "//npm.pkg.github.com/:_authToken=${GH_READ_TOKEN}" > .npmrc
         echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
       env:
@@ -41,6 +42,11 @@ jobs:
     - run: npm run test
       env:
         CI: true
+
+    - name: pre-publish
+      run: |
+        rm .npmrc
+        mv .npmrc.github .npmrc
     
     - run: npm publish
       if: github.ref == 'refs/heads/main'
