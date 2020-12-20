@@ -16,14 +16,14 @@ describe("AHT20", () => {
     const emitAssertion = <ChaiEmit><unknown>chai.expect(device);
     emitAssertion.emit("humidity", (h: number) => {
       winston.info(`Humidity: ${h}`);
-      chai.expect(h).to.be.within(0, 100);
+      chai.expect(h).to.be.within(1, 100);
     });
     emitAssertion.emit("temperature", (t: number) => {
       winston.info(`Temperature: ${t}`);
-      chai.expect(t).to.be.within(0, 120);
+      chai.expect(t).to.be.within(1, 120);
     });
     await device.init();
-    await new Promise(r => setTimeout(() => r(), 20));
+    await new Promise<void>(r => setTimeout(() => r(), 1000));
     winston.info(JSON.stringify({
       humidity: device.humidity,
       temperature: device.temperature,

@@ -3,7 +3,7 @@ import winston from "winston";
 winston.configure({
   format: winston.format.combine(
     winston.format.colorize(),
-    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS" }),
     winston.format.printf((info) => {
       let msg = info.message;
       msg = `${info.timestamp} ${info.level} [${info.type}/${info.name}]: ${msg}`;

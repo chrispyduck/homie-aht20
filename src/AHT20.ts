@@ -11,6 +11,7 @@ interface ICommands {
   status: II2CCommand,
   init: II2CCommand,
   measure: II2CCommand,
+  reset: II2CCommand,
 }
 const commands: ICommands = {
   status: {
@@ -27,6 +28,10 @@ const commands: ICommands = {
     delay: 80,
     id: 0xAC,
   },
+  reset: {
+    delay: 20,
+    id: 0xBA,
+  }
 };
 
 const COMMAND_STATUS_BIT_CALIBRATION_ENABLE = 3;
@@ -37,6 +42,7 @@ enum State {
   Idle = 1,
   ReceiveStatus = 10,
   ReceiveMeasurement = 11,
+  Reset = 99,
 }
 
 export default class AHT20 extends I2CDevice implements ISensor {
@@ -56,6 +62,9 @@ export default class AHT20 extends I2CDevice implements ISensor {
   private temperature$ = 0;
   public get temperature(): number { return this.temperature$; }
 
+  private lastReset = new Date().getTime();
+  private zeroReads = 0;
+
   private readonly buffer = Buffer.alloc(8);
   private state$ = State.Unknown;
   private setState = (value: State) => {
@@ -73,6 +82,14 @@ export default class AHT20 extends I2CDevice implements ISensor {
     if (!status.calibrationEnabled)
       await this.initializeDevice();
     await this.measure();
+  }
+
+  protected reeset = async (): Promise<void> => {
+    this.lastReset = new Date().getTime();
+    this.logger.verbose("Resetting AHT20");
+    this.setState(State.Reset);
+    await this.sendCommand(commands.reset);
+    await this.onInit();
   }
 
   public register = (device: HomieDevice): void => {
@@ -187,7 +204,17 @@ export default class AHT20 extends I2CDevice implements ISensor {
     const crc_computed = this.crc8x_simple(readResult.buffer, 6);
     if (crc_received != crc_computed) {
       this.logger.warn(`Received invalid data from sensor (crc received=${crc_received}, computed=${crc_computed}): ${readResult.buffer.toString("hex")}`);
+    } else if (this.humidity$ == 0 && this.temperature$ == 0) {
+      this.zeroReads++;
+      const now = new Date().getTime();
+      const secondsSinceLastReset = (now - this.lastReset) / 1000;
+      if (secondsSinceLastReset >= 90 && this.zeroReads >= 5) {
+        this.logger.info(`Initiating automatic programmatic reset of AHT20 due to ${this.zeroReads} continuous all-zero readings`)
+      } else {
+        this.logger.debug(`Received all-zero reading; count=${this.zeroReads}, secondsSinceLastReset=${secondsSinceLastReset}`);
+      }
     } else {
+      this.zeroReads = 0;
       this.emit("humidity", this.humidity$);
       this.emit("temperature", this.temperature$);
     }
