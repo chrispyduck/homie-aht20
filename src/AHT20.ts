@@ -209,7 +209,7 @@ export default class AHT20 extends I2CDevice implements ISensor {
       const now = new Date().getTime();
       const secondsSinceLastReset = (now - this.lastReset) / 1000;
       if (secondsSinceLastReset >= 90 && this.zeroReads >= 5) {
-        this.logger.info(`Initiating automatic programmatic reset of AHT20 due to ${this.zeroReads} continuous all-zero readings`)
+        this.logger.info(`Initiating automatic programmatic reset of AHT20 due to ${this.zeroReads} continuous all-zero readings`);
       } else {
         this.logger.debug(`Received all-zero reading; count=${this.zeroReads}, secondsSinceLastReset=${secondsSinceLastReset}`);
       }
