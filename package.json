@@ -21,10 +21,11 @@
   ],
   "devDependencies": {
     "@bazel/typescript": "^1.7.0",
-    "@chrispyduck/homie-device": "^0.1.1-main.4d479b6",
+    "@chrispyduck/homie-device": "^0.1.23",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
+    "@types/request": "^2.48.5",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
     "@typescript-eslint/parser": "^4.9.0",
     "chai": "^4.2.0",
@@ -47,7 +48,7 @@
     "winston": "^3.3.3"
   },
   "peerDependencies": {
-    "@chrispyduck/homie-device": "^0.1.1-unstable"
+    "@chrispyduck/homie-device": "^0.1.23"
   },
   "scripts": {
     "watch": "watch 'npm run test' .",
