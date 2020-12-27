@@ -7,6 +7,11 @@ import ISensor from "./ISensor";
 
 export const I2C_ADDRESS = 0x38;
 
+export interface ITemperatureAndHumidity {
+  temperature: number;
+  humidity: number;
+}
+
 interface ICommands {
   status: II2CCommand,
   init: II2CCommand,
@@ -45,7 +50,7 @@ enum State {
   Reset = 99,
 }
 
-export default class AHT20 extends I2CDevice implements ISensor {
+export default class AHT20 extends I2CDevice implements ISensor<ITemperatureAndHumidity> {
 
   public static readonly DefaultConfiguration: II2CConfiguration = {
     busNumber: 1,
@@ -81,7 +86,7 @@ export default class AHT20 extends I2CDevice implements ISensor {
     const status = await this.queryStatus();
     if (!status.calibrationEnabled)
       await this.initializeDevice();
-    await this.measure();
+    await this.read();
   }
 
   protected reeset = async (): Promise<void> => {
@@ -157,7 +162,7 @@ export default class AHT20 extends I2CDevice implements ISensor {
     await this.sendCommand(commands.init);
   }
 
-  private measure = async (): Promise<void> => {
+  public read = async (): Promise<ITemperatureAndHumidity> => {
     this.logger.debug("Requesting measurement");
     this.setState(State.ReceiveStatus);
     await this.sendCommand(commands.measure);
@@ -177,8 +182,7 @@ export default class AHT20 extends I2CDevice implements ISensor {
      */
     const readResult = await this.bus.i2cRead(this.configuration.deviceId, 7, this.buffer);
     if (readResult.bytesRead < 5) {
-      this.logger.warn(`Sensor returned ${readResult.bytesRead} bytes, but we need at least 5`);
-      return;
+      throw new Error(`Sensor returned ${readResult.bytesRead} bytes, but we need at least 5`);
     }
 
     // adapted from https://github.com/adafruit/Adafruit_AHTX0/blob/master/Adafruit_AHTX0.cpp#L142
@@ -219,6 +223,11 @@ export default class AHT20 extends I2CDevice implements ISensor {
       this.emit("temperature", this.temperature$);
     }
     this.setState(State.Idle);
+
+    return {
+      temperature: this.temperature$,
+      humidity: this.humidity$,
+    };
   }
 
   // adapted from https://stackoverflow.com/questions/51752284/how-to-calculate-crc8-in-c
