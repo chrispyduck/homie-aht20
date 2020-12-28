@@ -5,4 +5,5 @@ import { HomieDevice } from "@chrispyduck/homie-device";
 export default interface ISensor<TResult extends Record<never, any>> {
   register(device: HomieDevice): void;
   read(): Promise<TResult>;
+  init(): Promise<void>;
 }

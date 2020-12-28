@@ -1,5 +1,5 @@
 import i2c from "i2c-bus";
-import winston from "winston";
+import * as winston from "winston";
 import { merge } from "lodash";
 import { II2CCommand } from "./II2CCommand";
 import AHT20 from "./AHT20";
