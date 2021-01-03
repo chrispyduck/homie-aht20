@@ -1,5 +1,6 @@
-export { default as AHT20, ITemperatureAndHumidity } from "./AHT20";
-export { II2CConfiguration } from "./II2CConfiguration";
-export { II2CCommand } from "./II2CCommand";
-export { I2CDevice } from "./I2CDevice";
-export { default as ISensor } from "./ISensor";
+export { default as AHT20, ITemperatureAndHumidity } from "./i2c/AHT20";
+export { default as ArrisSurfboard, IMetrics } from "./net/ArrisSurfboard";
+export { II2CConfiguration } from "./i2c/II2CConfiguration";
+export { II2CCommand } from "./i2c/II2CCommand";
+export { I2CDevice } from "./i2c/I2CDevice";
+export { ISensor, ISensorType, ISensorConfiguration } from "./ISensor";
