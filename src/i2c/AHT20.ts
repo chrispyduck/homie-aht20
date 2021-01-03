@@ -3,7 +3,7 @@ import { merge } from "lodash";
 import { I2CDevice } from "./I2CDevice";
 import { II2CCommand } from "./II2CCommand";
 import { II2CConfiguration } from "./II2CConfiguration";
-import ISensor from "./ISensor";
+import { ISensor, ISensorType, staticImplements } from "../ISensor";
 
 export const I2C_ADDRESS = 0x38;
 
@@ -50,9 +50,21 @@ enum State {
   Reset = 99,
 }
 
+/**
+ * [Adafruit AHT20](https://www.adafruit.com/product/4566) temperature and humidity sensor using I2C. Read-only.
+ */
+@staticImplements<ISensorType<II2CConfiguration, ITemperatureAndHumidity>>()
 export default class AHT20 extends I2CDevice implements ISensor<ITemperatureAndHumidity> {
 
   public static readonly DefaultConfiguration: II2CConfiguration = {
+    type: "i2c",
+    model: "AHT20",
+    node: {
+      name: "AHT20",
+      friendlyName: "AHT20",
+      type: "Sensor",
+      isRange: false,
+    },
     busNumber: 1,
     deviceId: I2C_ADDRESS
   };

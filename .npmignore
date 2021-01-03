@@ -11,3 +11,4 @@ tsconfig.*
 src
 bin
 test
+**/*.tests.ts

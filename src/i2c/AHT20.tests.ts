@@ -1,6 +1,5 @@
-import AHT20 from "../src/AHT20";
+import AHT20 from "./AHT20";
 import * as chai from "chai";
-import _mocha from "mocha";
 import winston from "winston";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

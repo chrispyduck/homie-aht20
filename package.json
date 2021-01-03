@@ -21,7 +21,7 @@
   ],
   "devDependencies": {
     "@bazel/typescript": "^1.7.0",
-    "@chrispyduck/homie-device": "^0.1.23",
+    "@chrispyduck/homie-device": "^0.1.24",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
@@ -41,22 +41,27 @@
   },
   "dependencies": {
     "@types/i2c-bus": "^5.1.0",
+    "@types/jsdom": "^16.2.5",
     "@types/lodash": "^4.14.165",
     "@types/node": "^13.13.9",
     "i2c-bus": "^5.2.1",
+    "jsdom": "^16.4.0",
     "lodash": "^4.17.20",
     "winston": "^3.3.3"
   },
   "peerDependencies": {
-    "@chrispyduck/homie-device": "^0.1.23"
+    "@chrispyduck/homie-device": "^0.1.24"
   },
   "scripts": {
     "watch": "watch 'npm run test' .",
     "clean": "npx shx rm -rf .nyc_output/ node_modules/ dist/ docs/ tsconfig.tsbuildinfo tsconfig.src.tsbuildinfo",
     "build": "npx tsc --build src",
     "rebuild": "npm run clean && npm install && npm run build",
-    "test": "npx nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts test/**/*.js",
-    "test.all": "npx nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register test/**/*.ts test/**/*.js",
+    "test": "npx nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register --grep '#Integration' --invert test/**/*.ts src/**/*.tests.ts",
+    "test.dir": "npx nyc --source-map --include \"src/${DIR}/**/*.ts\" mocha --exit -r ts-node/register test/**/*.ts \"src/${DIR}/**/*.tests.ts\" ",
+    "test.all": "npx nyc --source-map --include 'src/**/*.ts' mocha --exit -r ts-node/register test/**/*.ts src/*.tests.ts src/**/*.tests.ts",
+    "test.i2c": "env DIR=i2c npm run test.dir",
+    "test.net": "env DIR=net npm run test.dir",
     "coverage": "npx nyc report --reporter=text-lcov | coveralls",
     "lint": "npx eslint 'src/**/*.ts' 'test/**/*.ts'"
   }
