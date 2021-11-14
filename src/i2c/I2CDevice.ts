@@ -5,6 +5,7 @@ import { II2CCommand } from "./II2CCommand";
 import AHT20 from "./AHT20";
 import { II2CConfiguration } from "./II2CConfiguration";
 import { EventEmitter } from "events";
+import os from "os";
 
 export abstract class I2CDevice extends EventEmitter {
   constructor(deviceType: string, configuration?: II2CConfiguration) {
@@ -27,8 +28,13 @@ export abstract class I2CDevice extends EventEmitter {
   }
 
   public init = async (): Promise<void> => {
+    if (os.platform() != "linux" || os.arch() != "arm") {
+      throw new Error("i2c is only supported on linux/arm");
+    }
     this.logger.verbose(`Opening I2C bus #${this.configuration.busNumber}`);
-    this.bus$ = await i2c.openPromisified(this.configuration.busNumber);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const i2c_module = require("i2c-bus");
+    this.bus$ = await i2c_module.openPromisified(this.configuration.busNumber);
     this.onInit();
   };
 
