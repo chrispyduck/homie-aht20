@@ -23,6 +23,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: https://npm.pkg.github.com/ #https://registry.npmjs.org/
         scope: chrispyduck
+        always-auth: true
 
     #- uses: jgierer12/npm-auth-gpr@v1
     #  with:
