@@ -19,6 +19,9 @@
     "IoT",
     "RaspberryPi"
   ],
+  "engines": {
+    "node": "~15.5"
+  },
   "devDependencies": {
     "@bazel/typescript": "^1.7.0",
     "@chrispyduck/homie-device": "^0.1.24",
@@ -26,6 +29,7 @@
     "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "@types/request": "^2.48.5",
+    "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^4.9.0",
     "@typescript-eslint/parser": "^4.9.0",
     "chai": "^4.2.0",
