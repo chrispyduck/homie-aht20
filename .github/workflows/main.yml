@@ -49,6 +49,14 @@ jobs:
     - name: Update Package Version
       run: npm version 0.1.${GITHUB_RUN_NUMBER} --no-git-tag-version
 
+    - name: Configure Node.js ${{ matrix.node-version }} for GPR
+      if: github.ref == 'refs/heads/main'
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: https://npm.pkg.github.com/
+        scope: chrispyduck 
+        always-auth: true
 
     - name: Publish (GitHub Package Registry)
       if: github.ref == 'refs/heads/main'
@@ -59,6 +67,15 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Configure Node.js ${{ matrix.node-version }} for NPM
+      if: github.ref == 'refs/heads/main'
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        registry-url: https://registry.npmjs.org/
+        scope: chrispyduck 
+        always-auth: true
+
     - name: Publish (npmjs)
       if: github.ref == 'refs/heads/main'
       run: |
@@ -68,12 +85,5 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     
-    #- name: Configure Node.js ${{ matrix.node-version }} for GPR
-    #  if: github.ref == 'refs/heads/main'
-    #  uses: actions/setup-node@v1
-    #  with:
-    #    node-version: ${{ matrix.node-version }}
-    #    registry-url: https://npm.pkg.github.com/
-    #    scope: chrispyduck 
-    #    always-auth: true
+    
 
