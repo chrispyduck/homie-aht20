@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Configure Node.js ${{ matrix.node-version }} for npmjs
+    - name: Configure Node.js ${{ matrix.node-version }} for build using GPR
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
@@ -61,8 +61,8 @@ jobs:
     - name: Publish (GitHub Package Registry)
       if: github.ref == 'refs/heads/main'
       run: |
-        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
-        echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+        #echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
         npm publish --access public
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,8 +79,8 @@ jobs:
     - name: Publish (npmjs)
       if: github.ref == 'refs/heads/main'
       run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
-        echo "@chrispyduck=https://registry.npmjs.org/" >> .npmrc
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
+        #echo "@chrispyduck=https://registry.npmjs.org/" >> .npmrc
         npm publish --access public --@chrispyduck:registry=https://registry.npmjs.org/
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
