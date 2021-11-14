@@ -324,7 +324,7 @@ export default class ArrisSurfboardStatus implements ISensor<IMetrics> {
 
   private extractDownstreamChannels = (rows: HTMLCollectionOf<HTMLTableRowElement>): Array<IDownstreamChannel> => {
     const result: Array<IDownstreamChannel> = [];
-    for (var i = 2; i < rows.length; i++) {
+    for (let i = 2; i < rows.length; i++) {
       const channelID = Number.parseInt(rows[i].children[0].innerHTML);
       if (channelID > 0) {
         const cellValues = Array
@@ -348,7 +348,7 @@ export default class ArrisSurfboardStatus implements ISensor<IMetrics> {
 
   private extractUpstreamChannels = (rows: HTMLCollectionOf<HTMLTableRowElement>): Array<IUpstreamChannel> => {
     const result: Array<IUpstreamChannel> = [];
-    for (var i = 2; i < rows.length; i++) {
+    for (let i = 2; i < rows.length; i++) {
       const channelNum = Number.parseInt(rows[i].children[0].innerHTML);
       if (channelNum > 0) {
         const cellValues = Array
