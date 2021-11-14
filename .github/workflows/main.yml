@@ -21,22 +21,18 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-        registry-url: https://npm.pkg.github.com/ #https://registry.npmjs.org/
+        registry-url: https://npm.pkg.github.com/
         scope: chrispyduck
         always-auth: true
 
-    #- uses: jgierer12/npm-auth-gpr@v1
-    #  with:
-    #    token: ${{ secrets.GH_READ_TOKEN }}
-
     - name: Add GPR to .npmrc
       run: |
-        echo "//npm.pkg.github.com/:_authToken=${GH_READ_TOKEN}" > .npmrc
+        echo "//npm.pkg.github.com/:_authToken=${GH_TOKEN}" > .npmrc
         echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
       env:
-        GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - run: npm install
+    - run: npm clean-install
 
     - run: npm run build
 
@@ -45,45 +41,75 @@ jobs:
     - run: npm run test
       env:
         CI: true
-    
+
     - name: Update Package Version
       run: npm version 0.1.${GITHUB_RUN_NUMBER} --no-git-tag-version
 
-    - name: Configure Node.js ${{ matrix.node-version }} for GPR
-      if: github.ref == 'refs/heads/main'
-      uses: actions/setup-node@v1
+    - name: Zip lib & node_modules
+      run: zip -9qry "build.zip" "./" -i "node_modules/*"
+
+    - name: Upload build.zip
+      uses: actions/upload-artifact@v2
       with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: https://npm.pkg.github.com/
-        scope: chrispyduck 
-        always-auth: true
+        name: build.zip
+        path: build.zip
 
-    - name: Publish (GitHub Package Registry)
-      if: github.ref == 'refs/heads/main'
-      run: |
-        echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
-        #echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
-        npm publish --access public
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  publish-npm:
+    if: github.ref == 'refs/heads/main'
+    needs: build
 
-    - name: Configure Node.js ${{ matrix.node-version }} for NPM
-      if: github.ref == 'refs/heads/main'
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        registry-url: https://registry.npmjs.org/
-        scope: chrispyduck 
-        always-auth: true
+    runs-on: ubuntu-latest
 
-    - name: Publish (npmjs)
-      if: github.ref == 'refs/heads/main'
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-        #echo "@chrispyduck=https://registry.npmjs.org/" >> .npmrc
-        npm publish --access public --@chrispyduck:registry=https://registry.npmjs.org/
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    
-    
+    strategy:
+      matrix:
+        node-version: [15.5]
 
+    steps:
+      - uses: actions/checkout@master
+      - name: Download build.zip
+        uses: actions/download-artifact@v2
+        with:
+          name: build.zip
+      - name: Unzip
+        run: unzip -q build.zip 
+      - name: Configure Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://registry.npmjs.org/
+          scope: chrispyduck
+          always-auth: true
+      - name: Publish
+        run: npm publish --access public
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-gpr:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [15.5]
+
+    steps:
+      - uses: actions/checkout@master
+      - name: Download build.zip
+        uses: actions/download-artifact@v2
+        with:
+          name: build.zip
+      - name: Unzip
+        run: unzip -q build.zip 
+      - name: Configure Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://npm.pkg.github.com/
+          scope: chrispyduck
+          always-auth: true
+      - name: Publish
+        run: npm publish --access public
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
