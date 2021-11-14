@@ -112,8 +112,7 @@ jobs:
           always-auth: true
       - name: Publish
         run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" > .npmrc
-          echo "@chrispyduck=https://npm.pkg.github.com/" >> .npmrc
+          npm set "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}"
           npm publish --access public
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
