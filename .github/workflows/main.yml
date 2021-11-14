@@ -77,7 +77,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org/
-          scope: chrispyduck
+          scope: '@chrispyduck'
           always-auth: true
       - name: Publish
         run: npm publish --access public
@@ -107,7 +107,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://npm.pkg.github.com/
-          scope: chrispyduck
+          scope: '@chrispyduck'
           always-auth: true
       - name: Publish
         run: npm publish --access public
