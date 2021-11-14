@@ -12,3 +12,4 @@ src
 bin
 test
 **/*.tests.ts
+buid.zip

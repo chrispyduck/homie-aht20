@@ -46,7 +46,7 @@ jobs:
       run: npm version 0.1.${GITHUB_RUN_NUMBER} --no-git-tag-version
 
     - name: Zip lib & node_modules
-      run: zip -9ry "build.zip" "./" -i "dist/*"
+      run: zip -9ry "build.zip" "./" -i "package*.json" -i "dist/*" -i ".npmignore" -i "tsconfig.json" -i "README.md"
  
     - name: Upload build.zip
       uses: actions/upload-artifact@v2
@@ -65,7 +65,6 @@ jobs:
         node-version: [15.5]
 
     steps:
-      - uses: actions/checkout@v2
       - name: Download build.zip
         uses: actions/download-artifact@v2
         with:
@@ -98,7 +97,6 @@ jobs:
         node-version: [15.5]
 
     steps:
-      - uses: actions/checkout@v2
       - name: Download build.zip
         uses: actions/download-artifact@v2
         with:
