@@ -4,13 +4,9 @@ import { I2CDevice } from "./I2CDevice";
 import { II2CCommand } from "./II2CCommand";
 import { II2CConfiguration } from "./II2CConfiguration";
 import { ISensor, ISensorEvents, ISensorType, staticImplements } from "../ISensor";
+import { ITemperatureAndHumidity } from "../interfaces/ITemperatureAndHumidity";
 
 export const I2C_ADDRESS = 0x38;
-
-export interface ITemperatureAndHumidity {
-  temperature: number;
-  humidity: number;
-}
 
 interface ICommands {
   status: II2CCommand,
