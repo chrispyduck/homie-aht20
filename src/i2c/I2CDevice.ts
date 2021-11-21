@@ -6,8 +6,10 @@ import AHT20 from "./AHT20";
 import { II2CConfiguration } from "./II2CConfiguration";
 import { EventEmitter } from "events";
 import os from "os";
+import { ISensor } from "../ISensor";
+import { HomieDevice } from "@chrispyduck/homie-device";
 
-export abstract class I2CDevice extends EventEmitter {
+export abstract class I2CDevice<TResult extends Record<never, any>> extends EventEmitter implements ISensor<TResult> {
   constructor(deviceType: string, configuration?: II2CConfiguration) {
     super();
     this.configuration = merge({}, AHT20.DefaultConfiguration, configuration);
@@ -16,6 +18,9 @@ export abstract class I2CDevice extends EventEmitter {
       name: "default",
     });
   }
+
+  public abstract register(device: HomieDevice): void;
+  public abstract read(): Promise<TResult>;
 
   protected readonly configuration: II2CConfiguration;
   protected readonly logger: winston.Logger;

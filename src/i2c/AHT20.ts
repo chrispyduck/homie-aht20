@@ -3,7 +3,7 @@ import { merge } from "lodash";
 import { I2CDevice } from "./I2CDevice";
 import { II2CCommand } from "./II2CCommand";
 import { II2CConfiguration } from "./II2CConfiguration";
-import { ISensor, ISensorType, staticImplements } from "../ISensor";
+import { ISensor, ISensorEvents, ISensorType, staticImplements } from "../ISensor";
 
 export const I2C_ADDRESS = 0x38;
 
@@ -50,11 +50,26 @@ enum State {
   Reset = 99,
 }
 
+export interface IAHT20Events extends ISensorEvents<ITemperatureAndHumidity> {
+  "temperature": (temp: number) => void;
+  "humidity": (hum: number) => void;
+}
+
+export interface IAHT20 {
+  on<U extends keyof IAHT20Events>(
+    event: U, listener: IAHT20Events[U]
+  ): this;
+
+  emit<U extends keyof IAHT20Events>(
+    event: U, ...args: Parameters<IAHT20Events[U]>
+  ): boolean;
+}
+
 /**
  * [Adafruit AHT20](https://www.adafruit.com/product/4566) temperature and humidity sensor using I2C. Read-only.
  */
 @staticImplements<ISensorType<II2CConfiguration, ITemperatureAndHumidity>>()
-export default class AHT20 extends I2CDevice implements ISensor<ITemperatureAndHumidity> {
+export default class AHT20 extends I2CDevice<ITemperatureAndHumidity> implements ISensor<ITemperatureAndHumidity>, IAHT20 {
 
   public static readonly DefaultConfiguration: II2CConfiguration = {
     type: "i2c",
@@ -149,7 +164,7 @@ export default class AHT20 extends I2CDevice implements ISensor<ITemperatureAndH
     this.logger.verbose("Requesting device status");
     this.setState(State.ReceiveStatus);
     await this.sendCommand(commands.status);
-    return await this.readStatus(State.Idle);
+    return this.readStatus(State.Idle);
   }
 
   private readStatus = async (stateIfIdle: State = State.Idle): Promise<IStatusResult> => {
@@ -172,6 +187,8 @@ export default class AHT20 extends I2CDevice implements ISensor<ITemperatureAndH
       throw new Error("Bus has not been opened. Did you forget to call init()?");
     this.logger.verbose("Sending initialization command to AHT20");
     await this.sendCommand(commands.init);
+    await this.delay(20);
+    super.emit("init");
   }
 
   public read = async (): Promise<ITemperatureAndHumidity> => {
@@ -236,10 +253,12 @@ export default class AHT20 extends I2CDevice implements ISensor<ITemperatureAndH
     }
     this.setState(State.Idle);
 
-    return {
+    const returnValue = {
       temperature: this.temperature$,
       humidity: this.humidity$,
     };
+    this.emit("read", returnValue);
+    return returnValue;
   }
 
   // adapted from https://stackoverflow.com/questions/51752284/how-to-calculate-crc8-in-c

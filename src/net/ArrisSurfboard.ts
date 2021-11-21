@@ -3,9 +3,10 @@ import { ISensor, staticImplements, ISensorType } from "../ISensor";
 import { ICableModemScraperConfiguration } from "./INetClientConfiguration";
 import { merge } from "lodash";
 import jsdom from "jsdom";
+import { EventEmitter } from "events";
 
 @staticImplements<ISensorType<ICableModemScraperConfiguration, IMetrics>>()
-export default class ArrisSurfboardStatus implements ISensor<IMetrics> {
+export default class ArrisSurfboardStatus extends EventEmitter implements ISensor<IMetrics> {
 
   public static readonly DefaultConfiguration: ICableModemScraperConfiguration = {
     type: "net",
@@ -22,6 +23,7 @@ export default class ArrisSurfboardStatus implements ISensor<IMetrics> {
   };
 
   constructor(config?: ICableModemScraperConfiguration) {
+    super();
     this.config = merge({}, ArrisSurfboardStatus.DefaultConfiguration, config);
   }
 
